@@ -83,7 +83,7 @@ class Dp:
         for i in df.index :
             line = df['desc'][i] 
             [self.vocab.update(line.split())]
-        self.vocab_len = len(self.vocab)    
+        self.vocab_len = len(self.vocab) + 1    
         return self.vocab            
 
     def word_index(self) :
@@ -139,28 +139,14 @@ class Dp:
             self.photo[image_id] = self.features[image_id]
         f.close()
         for i in self.df.index:
-            image_id = df['image_id'][i]
+            image_id = self.df['image_id'][i]
             if image_id in self.dataset:
                 if image_id not in self.description_dataset :
                     self.description_dataset[image_id] = list()
-                self.description_dataset[image_id].append(df['desc'][i])         
+                self.description_dataset[image_id].append(self.df['desc'][i])         
         return self.photo,self.dataset,self.description_dataset
 
-    def create_sequences(self) :    
-        for key, desc_list in self.description_dataset.items() :
-            for d in desc_list :
-                seq = [self.word_to_ix[word] for word in d.split(' ') if word in self.word_to_ix]
-                for i in range(1,len(seq)) :
-                    in_seq, out_seq = seq[:i], seq[i]
-                    in_seq = pad_sequences([in_seq],maxlen=self.max_len)[0]
-                    out_seq = to_categorical([out_seq],num_classes=len(self.vocab)+1)[0]
-                    self.X1.append(self.photo[key])
-                    self.X2.append(in_seq)
-                    self.y.append(out_seq)
-        self.X1 = np.array(self.X1)
-        self.X2 = np.array(self.X2)
-        self.y = np.array(self.y)
-        return self.X1,self.X2,self.y
+    
 
 if __name__ == "__main__":
     ob  = Dp("D:\Coding_wo_cp\Image_Caption_Generator\Flickr8k.token.txt")
@@ -171,4 +157,3 @@ if __name__ == "__main__":
     m = ob.maxLength()
     features = ob.feature_extract('D:\Coding_wo_cp\Image_Caption_Generator\Flicker8k_Dataset')   
     photo,dataset,description_dataset = ob.load_dataset('D:\Coding_wo_cp\Image_Caption_Generator\Flickr_8k.trainImages.txt')
-    X1,X2,y = ob.create_sequences()
