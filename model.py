@@ -96,36 +96,7 @@ class model_build():
         # model.layers[2].trainable = False
         
         model.summary()
-        return model  
-
-    def greedy_search(self,model,photo_file):
-        in_text = 'startseq'
-        photo = self.dp.single_feature_extract(photo_file)
-        # photo = np.reshape(photo,photo.shape[1])
-        with open('word_to_ix.json', 'r') as f:
-            self.dp.word_to_ix = json.load(f)
-        with open('ix_to_word.json', 'r') as f:
-            self.dp.ix_to_word = json.load(f)  
-
-        self.dp.ix_to_word = { int(i) : w for i,w in self.dp.ix_to_word.items()}    
-        self.dp.word_to_ix = { w : int(i) for w,i in self.dp.word_to_ix.items()}   
-
-        print(photo.shape,type(photo))
-        print(self.dp.word_to_ix['endseq'])
-        for i in range(self.dp.max_len) :
-            seq = [self.dp.word_to_ix[w] for w in in_text.split() if w in self.dp.word_to_ix] 
-            seq = pad_sequences([seq],maxlen=self.dp.max_len)
-            yhat = model.predict([photo, seq])
-            yhat = np.argmax(yhat)
-            word = self.dp.ix_to_word[yhat]
-            in_text += ' ' + word
-            if word=='endseq':
-                break
-        print(self.dp.max_len)    
-        final = in_text.split()
-        final = final[1:-1]
-        final = ' '.join(final)
-        return final                                                 
+        return model                                                  
 
 if __name__ == "__main__": 
 
@@ -160,12 +131,4 @@ if __name__ == "__main__":
                             steps_per_epoch=steps,
                             callbacks=[checkpoint],
                             validation_data=([X1_dev,X2_dev],y_dev))                   
-    model.save(directory + '\m' + model_no + '.h5')  
-
-    loaded_model = load_model('D:\Coding_wo_cp\Image_Caption_Generator\model-9_xception\model-ep001-loss3.283-val_loss3.734.h5')
-    description = mb.greedy_search(loaded_model,'D:/Coding_wo_cp/Image_Caption_Generator/Flicker8k_Dataset/872622575_ba1d3632cc.jpg')
-    im = plt.imread('D:/Coding_wo_cp/Image_Caption_Generator/Flicker8k_Dataset/872622575_ba1d3632cc.jpg')
-    plt.imshow(im) 
-    plt.xlabel(description)
-
-    # TODO : save mapping of words along with models                       
+    model.save(directory + '\m' + model_no + '.h5')                        

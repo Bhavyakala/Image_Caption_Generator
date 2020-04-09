@@ -130,18 +130,7 @@ class Dp:
             if self.max_len < l :
                 self.max_len = l
         return self.max_len 
-
-    def single_feature_extract(self,filename) :
-        model = InceptionV3()
-        # model = ResNet50(weigts='imagenet')
-        model.layers.pop()
-        model = Model(input=model.inputs, outputs=model.layers[-1].output)
-        image = load_img(filename,target_size=(model.input_shape[1],model.input_shape[2]))
-        image = img_to_array(image)
-        image = np.expand_dims(image,axis=0)
-        image = preprocess_input(image)
-        feature = model.predict(image)
-        return feature    
+ 
     def feature_extract(self,directory) :
         # model = InceptionV3()
         # # model = ResNet50(weights='imagenet')
