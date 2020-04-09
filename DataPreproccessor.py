@@ -4,15 +4,22 @@ import pandas as pd
 import csv,string
 import json
 import keras
-import tensorflow as tf
-from keras.applications.vgg16 import VGG16,preprocess_input
-from keras.applications.vgg19 import VGG19
+from keras.applications.inception_v3 import InceptionV3,preprocess_input
+# from keras.applications.vgg16 import VGG16,preprocess_input
+# from keras.applications.vgg19 import VGG19,preprocess_input
+# from keras.applications.xception import Xception,preprocess_input
+from keras.applications.resnet50 import ResNet50,preprocess_input
 from keras.models import Model
 from keras.preprocessing.image import load_img,img_to_array
 from keras.preprocessing.sequence import pad_sequences
 from keras.utils import to_categorical
+import pickle
 from PIL import Image
 from os import listdir
+import tensorflow as tf
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+tf.keras.backend.set_session(tf.Session(config=config))
 class Dp:
     address = ''
     desc = ''
@@ -125,24 +132,25 @@ class Dp:
         return self.max_len 
 
     def single_feature_extract(self,filename) :
-        # model = VGG16()
-        model = VGG19()
+        model = InceptionV3()
+        # model = ResNet50(weigts='imagenet')
         model.layers.pop()
         model = Model(input=model.inputs, outputs=model.layers[-1].output)
-        image = load_img(filename,target_size=(224,224))
+        image = load_img(filename,target_size=(model.input_shape[1],model.input_shape[2]))
         image = img_to_array(image)
         image = np.expand_dims(image,axis=0)
         image = preprocess_input(image)
         feature = model.predict(image)
         return feature    
     def feature_extract(self,directory) :
-        # model = VGG16()
+        # model = InceptionV3()
+        # # model = ResNet50(weights='imagenet')
         # model.layers.pop()
         # model = Model(input=model.inputs, outputs=model.layers[-1].output)
         # print(model.summary())
         # for name in listdir(directory) :
         #     filename = directory + '/' + name
-        #     image = load_img(filename, target_size=(224,224))
+        #     image = load_img(filename, target_size=(model.input_shape[1],model.input_shape[2]))
         #     image = img_to_array(image)
         #     image = np.expand_dims(image,axis=0)
         #     image = preprocess_input(image)
@@ -151,9 +159,9 @@ class Dp:
         #     self.features[image_id] = feature
         # for i in self.features.keys() :
         #     self.features[i] = self.features[i].tolist()
-        # with open('features_inception.json', 'w') as f:
+        # with open('features_inceptionV3.json', 'w') as f:
         #     json.dump(self.features,f)  
-        with open('features.json', 'r') as f:
+        with open('features_inceptionV3.json', 'r') as f:
             self.features = json.load(f)
         for i in self.features.keys() :
             self.features[i] = np.array(self.features[i])

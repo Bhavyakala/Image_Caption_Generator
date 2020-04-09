@@ -13,6 +13,9 @@ from keras.callbacks.callbacks import ModelCheckpoint
 from copy import deepcopy
 import keras
 import tensorflow as tf
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+tf.keras.backend.set_session(tf.Session(config=config))
 import datetime
 import json
 class model_build():
@@ -71,7 +74,7 @@ class model_build():
                     n=0
 
     def model_architecture(self) :
-        inputs1 = Input(shape=(4096,))
+        inputs1 = Input(shape=(2048,))
         fe1 = Dropout(0.5)(inputs1)
         fe2 = Dense(256, activation='relu')(fe1)
 
@@ -137,7 +140,7 @@ if __name__ == "__main__":
     X1_dev,X2_dev,y_dev = ob.create_sequences()
 
     # creating directory for saving model and corresponding mapping of word to ix
-    model_no = '8'
+    model_no = '11_inceptionV3'
     directory = 'model-'+ model_no
     os.mkdir(directory) 
 
@@ -159,10 +162,10 @@ if __name__ == "__main__":
                             validation_data=([X1_dev,X2_dev],y_dev))                   
     model.save(directory + '\m' + model_no + '.h5')  
 
-    loaded_model = load_model('D:\Coding_wo_cp\Image_Caption_Generator\model-8\model-ep001-loss3.420-val_loss3.866.h5')
-    description = mb.greedy_search(loaded_model,'D:/Coding_wo_cp/Image_Caption_Generator/Flicker8k_Dataset/2748729903_3c7c920c4d.jpg')
-    im = plt.imread('D:/Coding_wo_cp/Image_Caption_Generator/Flicker8k_Dataset/2748729903_3c7c920c4d.jpg')
-    plt.imshow(im)
+    loaded_model = load_model('D:\Coding_wo_cp\Image_Caption_Generator\model-9_xception\model-ep001-loss3.283-val_loss3.734.h5')
+    description = mb.greedy_search(loaded_model,'D:/Coding_wo_cp/Image_Caption_Generator/Flicker8k_Dataset/872622575_ba1d3632cc.jpg')
+    im = plt.imread('D:/Coding_wo_cp/Image_Caption_Generator/Flicker8k_Dataset/872622575_ba1d3632cc.jpg')
+    plt.imshow(im) 
     plt.xlabel(description)
 
     # TODO : save mapping of words along with models                       
